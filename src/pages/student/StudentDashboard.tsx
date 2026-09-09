@@ -1,54 +1,72 @@
+import { useState } from "react";
 import {
+  ArrowUpRight,
   ArrowRight,
   Bell,
   BookOpen,
   BriefcaseBusiness,
-  ChevronDown,
+  CheckCircle2,
+  ChevronRight,
   CircleHelp,
   FileText,
-  GraduationCap,
+  //GraduationCap,
   LayoutDashboard,
   LogOut,
   Menu,
+  MoreHorizontal,
   Search,
   Settings,
   Target,
   TrendingUp,
   User,
   X,
+  Zap,
 } from "lucide-react";
-import { useState } from "react";
 
 import "./StudentDashboard.css";
 
-const skills = [
-  { name: "JavaScript", score: 82 },
-  { name: "React", score: 64 },
-  { name: "Node.js", score: 42 },
-  { name: "MongoDB", score: 51 },
+type Skill = {
+  name: string;
+  score: number;
+  level: string;
+};
+
+type Opportunity = {
+  company: string;
+  role: string;
+  type: string;
+  location: string;
+  match: number;
+};
+
+const skills: Skill[] = [
+  { name: "JavaScript", score: 82, level: "Strong" },
+  { name: "React", score: 64, level: "Developing" },
+  { name: "MongoDB", score: 51, level: "Developing" },
+  { name: "Node.js", score: 42, level: "Needs work" },
 ];
 
-const opportunities = [
+const opportunities: Opportunity[] = [
   {
-    type: "Internship",
-    title: "Frontend Developer Intern",
     company: "TechNova",
-    match: 92,
-    location: "Remote",
-  },
-  {
+    role: "Frontend Developer Intern",
     type: "Internship",
-    title: "React Developer Intern",
-    company: "CodeLabs",
-    match: 87,
-    location: "Bengaluru",
+    location: "Remote",
+    match: 92,
   },
   {
-    type: "Job",
-    title: "Junior Web Developer",
+    company: "CodeLabs",
+    role: "React Developer Intern",
+    type: "Internship",
+    location: "Bengaluru",
+    match: 87,
+  },
+  {
     company: "Nexora",
-    match: 81,
+    role: "Junior Web Developer",
+    type: "Full-time",
     location: "Hybrid",
+    match: 81,
   },
 ];
 
@@ -59,7 +77,7 @@ const navItems = [
   { label: "Skill Analysis", icon: Target },
   { label: "Opportunities", icon: BriefcaseBusiness },
   { label: "Learning", icon: BookOpen },
-  { label: "Applications", icon: GraduationCap },
+  { label: "Applications", icon: CheckCircle2 },
   { label: "Progress", icon: TrendingUp },
 ];
 
@@ -68,90 +86,110 @@ function StudentDashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
 
+  const closeSidebar = () => setSidebarOpen(false);
+
   return (
     <div className="student-dashboard">
       {/* Mobile Overlay */}
       {sidebarOpen && (
-        <div
-          className="sidebar-overlay"
-          onClick={() => setSidebarOpen(false)}
+        <button
+          className="dashboard-overlay"
+          onClick={closeSidebar}
+          aria-label="Close sidebar"
         />
       )}
 
       {/* Sidebar */}
-      <aside className={`student-sidebar ${sidebarOpen ? "open" : ""}`}>
-        <div className="sidebar-top">
-          <div className="dashboard-logo">
-            <div className="logo-mark">S</div>
+      <aside className={`dashboard-sidebar ${sidebarOpen ? "open" : ""}`}>
+        <div className="sidebar-header">
+          <div className="brand-mark">
+            <span>S</span>
+          </div>
 
-            <div>
-              <h2>SkillBridge</h2>
-              <span>Student Portal</span>
-            </div>
+          <div className="brand-copy">
+            <strong>SkillBridge</strong>
+            <span>Student Portal</span>
           </div>
 
           <button
             className="mobile-close"
-            onClick={() => setSidebarOpen(false)}
-            aria-label="Close sidebar"
+            onClick={closeSidebar}
+            aria-label="Close menu"
           >
-            <X size={20} />
+            <X size={19} />
           </button>
         </div>
 
-        <nav className="dashboard-nav">
-          <p className="nav-label">WORKSPACE</p>
+        <div className="sidebar-section-label">WORKSPACE</div>
 
+        <nav className="dashboard-nav">
           {navItems.map((item) => {
             const Icon = item.icon;
+            const isActive = activeItem === item.label;
 
             return (
               <button
                 key={item.label}
-                className={`nav-item ${
-                  activeItem === item.label ? "active" : ""
-                }`}
+                className={`dashboard-nav-item ${isActive ? "active" : ""}`}
                 onClick={() => {
                   setActiveItem(item.label);
-                  setSidebarOpen(false);
+                  closeSidebar();
                 }}
               >
-                <Icon size={19} strokeWidth={1.8} />
+                <Icon size={18} strokeWidth={1.8} />
                 <span>{item.label}</span>
+
+                {item.label === "Opportunities" && (
+                  <span className="nav-count">12</span>
+                )}
               </button>
             );
           })}
         </nav>
 
         <div className="sidebar-bottom">
-          <div className="profile-progress">
-            <div className="progress-heading">
-              <span>Profile completion</span>
-              <strong>75%</strong>
+          <div className="completion-card">
+            <div className="completion-top">
+              <div>
+                <span>Profile completion</span>
+                <strong>75%</strong>
+              </div>
+              <span className="completion-icon">
+                <TrendingUp size={15} />
+              </span>
             </div>
 
-            <div className="progress-track">
-              <div className="progress-fill" style={{ width: "75%" }} />
+            <div className="completion-track">
+              <div className="completion-fill" />
             </div>
 
             <p>Complete your profile to improve matching.</p>
 
-            <button>
+            <button onClick={() => setActiveItem("My Profile")}>
               Complete profile
-              <ArrowRight size={14} />
+              <ArrowUpRight size={14} />
             </button>
           </div>
 
-          <div className="sidebar-actions">
-            <button>
-              <Settings size={18} />
-              Settings
-            </button>
+          <button className="sidebar-extra">
+            <Settings size={17} />
+            <span>Settings</span>
+          </button>
 
-            <button>
-              <CircleHelp size={18} />
-              Help & Support
-            </button>
+          <button className="sidebar-extra">
+            <CircleHelp size={17} />
+            <span>Help & Support</span>
+          </button>
+
+          <div className="sidebar-profile">
+            <div className="profile-avatar">KA</div>
+
+            <div className="sidebar-profile-info">
+              <strong>Khushi Ambastha</strong>
+              <span>Student</span>
+            </div>
+
+            <MoreHorizontal size={18} />
           </div>
         </div>
       </aside>
@@ -160,41 +198,50 @@ function StudentDashboard() {
       <div className="dashboard-main">
         {/* Topbar */}
         <header className="dashboard-topbar">
-          <button
-            className="mobile-menu"
-            onClick={() => setSidebarOpen(true)}
-            aria-label="Open sidebar"
-          >
-            <Menu size={22} />
-          </button>
-
-          <div className="dashboard-search">
-            <Search size={18} />
-            <input
-              type="text"
-              placeholder="Search courses, internships, skills..."
-            />
-          </div>
-
-          <div className="topbar-actions">
-            <button className="notification-btn">
-              <Bell size={20} strokeWidth={1.8} />
-              <span className="notification-dot" />
+          <div className="topbar-left">
+            <button
+              className="mobile-menu"
+              onClick={() => setSidebarOpen(true)}
+              aria-label="Open menu"
+            >
+              <Menu size={21} />
             </button>
 
-            <div className="profile-menu-wrapper">
+            <div className="breadcrumb">
+              <span>Student Portal</span>
+              <ChevronRight size={14} />
+              <strong>{activeItem}</strong>
+            </div>
+          </div>
+
+          <div className="topbar-right">
+            <div className="dashboard-search">
+              <Search size={17} />
+              <input placeholder="Search anything..." />
+              <span>⌘ K</span>
+            </div>
+
+            <button className="notification-button">
+              <Bell size={19} strokeWidth={1.8} />
+              <span />
+            </button>
+
+            <div className="topbar-profile">
               <button
-                className="topbar-profile"
+                className="topbar-profile-button"
                 onClick={() => setProfileOpen(!profileOpen)}
               >
-                <div className="profile-avatar">K</div>
+                <div className="topbar-avatar">KA</div>
 
-                <div className="profile-info">
+                <div>
                   <strong>Khushi</strong>
                   <span>Student</span>
                 </div>
 
-                <ChevronDown size={16} />
+                <ChevronRight
+                  size={15}
+                  className={profileOpen ? "rotate-chevron" : ""}
+                />
               </button>
 
               {profileOpen && (
@@ -203,17 +250,14 @@ function StudentDashboard() {
                     <User size={16} />
                     My Profile
                   </button>
-
                   <button>
                     <Settings size={16} />
                     Settings
                   </button>
-
-                  <div className="dropdown-divider" />
-
-                  <button className="logout-btn">
+                  <div />
+                  <button className="logout-button">
                     <LogOut size={16} />
-                    Logout
+                    Log out
                   </button>
                 </div>
               )}
@@ -221,248 +265,357 @@ function StudentDashboard() {
           </div>
         </header>
 
-        {/* Dashboard Content */}
         <main className="dashboard-content">
-          <section className="welcome-section">
+          {/* Welcome */}
+          <section className="dashboard-welcome">
             <div>
-              <p className="welcome-eyebrow">STUDENT DASHBOARD</p>
+              <div className="welcome-eyebrow">
+                <span className="status-dot" />
+                Your career workspace
+              </div>
 
               <h1>
-                Good morning, Khushi<span>.</span>
+                Good evening, Khushi<span>.</span>
               </h1>
 
               <p>
-                Here's a snapshot of your skills, progress and opportunities
-                waiting for you.
+                Keep building your skills. Your next opportunity is closer
+                than you think.
               </p>
             </div>
 
-            <button className="assessment-btn">
-              Take assessment
-              <ArrowRight size={17} />
+            <button className="assessment-button">
+              <Zap size={17} />
+              Take skill assessment
+              <ArrowUpRight size={16} />
             </button>
           </section>
 
-          {/* Stats */}
-          <section className="stats-grid">
-            <div className="stat-card">
-              <div className="stat-icon">
-                <TrendingUp size={20} />
+          {/* Main Stats */}
+          <section className="dashboard-stats">
+            <article className="stat-card featured-stat">
+              <div className="stat-card-top">
+                <span className="stat-label">Overall skill score</span>
+                <span className="stat-icon">
+                  <Target size={17} />
+                </span>
               </div>
 
-              <div className="stat-content">
-                <span>Overall Skill Score</span>
-                <strong>72%</strong>
-                <small className="positive">↑ 8% this month</small>
-              </div>
-            </div>
+              <div className="score-row">
+                <strong>72</strong>
+                <span>/100</span>
 
-            <div className="stat-card">
-              <div className="stat-icon">
-                <FileText size={20} />
+                <div className="score-change">
+                  <TrendingUp size={13} />
+                  +8%
+                </div>
               </div>
 
-              <div className="stat-content">
-                <span>Assessment Status</span>
-                <strong className="stat-status">Completed</strong>
-                <small>Last taken 4 days ago</small>
-              </div>
-            </div>
-
-            <div className="stat-card">
-              <div className="stat-icon">
-                <Target size={20} />
+              <div className="mini-progress">
+                <div style={{ width: "72%" }} />
               </div>
 
-              <div className="stat-content">
-                <span>Skill Gaps</span>
-                <strong>3</strong>
-                <small>Need improvement</small>
-              </div>
-            </div>
+              <p>Above 68% of students in your domain</p>
+            </article>
 
-            <div className="stat-card">
-              <div className="stat-icon">
-                <BriefcaseBusiness size={20} />
+            <article className="stat-card">
+              <div className="stat-card-top">
+                <span className="stat-label">Skill gaps</span>
+                <span className="stat-icon neutral">
+                  <Target size={17} />
+                </span>
               </div>
 
-              <div className="stat-content">
-                <span>Matched Opportunities</span>
+              <div className="simple-stat">
+                <strong>03</strong>
+              </div>
+
+              <div className="stat-bottom">
+                <span className="warning-dot" />
+                <span>2 high priority</span>
+              </div>
+            </article>
+
+            <article className="stat-card">
+              <div className="stat-card-top">
+                <span className="stat-label">Matched opportunities</span>
+                <span className="stat-icon neutral">
+                  <BriefcaseBusiness size={17} />
+                </span>
+              </div>
+
+              <div className="simple-stat">
                 <strong>12</strong>
-                <small>Based on your skills</small>
               </div>
-            </div>
+
+              <div className="stat-bottom positive">
+                <TrendingUp size={14} />
+                <span>4 new this week</span>
+              </div>
+            </article>
+
+            <article className="stat-card">
+              <div className="stat-card-top">
+                <span className="stat-label">Learning progress</span>
+                <span className="stat-icon neutral">
+                  <BookOpen size={17} />
+                </span>
+              </div>
+
+              <div className="simple-stat">
+                <strong>48%</strong>
+              </div>
+
+              <div className="stat-bottom">
+                <span>Node.js Fundamentals</span>
+              </div>
+            </article>
           </section>
 
           {/* Main Grid */}
           <section className="dashboard-grid">
-            {/* Skills */}
-            <div className="dashboard-card skills-card">
+            {/* Skill Profile */}
+            <article className="dashboard-card skill-card">
               <div className="card-header">
                 <div>
-                  <span className="card-eyebrow">SKILL PROFILE</span>
-                  <h2>Your current skills</h2>
+                  <span className="card-eyebrow">YOUR SKILLS</span>
+                  <h2>Skill profile</h2>
                 </div>
 
-                <button className="text-btn">
+                <button className="text-button">
                   View analysis
-                  <ArrowRight size={15} />
+                  <ArrowUpRight size={14} />
                 </button>
               </div>
 
-              <div className="skills-list">
+              <div className="skill-list">
                 {skills.map((skill) => (
-                  <div className="skill-row" key={skill.name}>
-                    <div className="skill-meta">
-                      <span>{skill.name}</span>
-                      <strong>{skill.score}%</strong>
+                  <div className="skill-item" key={skill.name}>
+                    <div className="skill-info">
+                      <div>
+                        <strong>{skill.name}</strong>
+                        <span
+                          className={`skill-level ${skill.level
+                            .toLowerCase()
+                            .replace(" ", "-")}`}
+                        >
+                          {skill.level}
+                        </span>
+                      </div>
+
+                      <strong className="skill-score">{skill.score}%</strong>
                     </div>
 
                     <div className="skill-track">
                       <div
-                        className="skill-progress"
+                        className={`skill-fill ${
+                          skill.score < 50
+                            ? "low"
+                            : skill.score < 70
+                              ? "medium"
+                              : "high"
+                        }`}
                         style={{ width: `${skill.score}%` }}
                       />
                     </div>
                   </div>
                 ))}
               </div>
-            </div>
 
-            {/* Next Step */}
-            <div className="dashboard-card next-step-card">
-              <div className="card-eyebrow">RECOMMENDED NEXT STEP</div>
+              <div className="skill-footer">
+                <div>
+                  <span className="legend-dot strong" />
+                  Strong
+                </div>
+                <div>
+                  <span className="legend-dot developing" />
+                  Developing
+                </div>
+                <div>
+                  <span className="legend-dot gap" />
+                  Needs work
+                </div>
+              </div>
+            </article>
 
-              <div className="next-step-icon">
-                <Target size={22} />
+            {/* Next Move */}
+            <article className="dashboard-card next-move-card">
+              <div className="next-move-label">
+                <span>
+                  <Zap size={14} />
+                  RECOMMENDED NEXT MOVE
+                </span>
+
+                <span className="priority-tag">HIGH PRIORITY</span>
               </div>
 
-              <h2>Strengthen your Node.js skills.</h2>
+              <h2>Strengthen your Node.js skills</h2>
 
               <p>
-                Your assessment shows that Node.js is currently your biggest
-                skill gap for your selected path.
+                Your current score is <strong>42%</strong>. Improving this
+                skill could unlock <strong>7 more opportunities</strong>.
               </p>
 
-              <div className="recommendation-meta">
-                <span>3 resources</span>
-                <span>•</span>
-                <span>~6 hours</span>
+              <div className="gap-visual">
+                <div className="gap-score">
+                  <strong>42</strong>
+                  <span>Current</span>
+                </div>
+
+                <div className="gap-line">
+                  <span />
+                </div>
+
+                <div className="gap-score target">
+                  <strong>70</strong>
+                  <span>Target</span>
+                </div>
               </div>
 
-              <button className="dark-btn">
-                Start learning
+              <button className="next-move-button">
+                View learning path
                 <ArrowRight size={16} />
               </button>
-            </div>
-          </section>
+            </article>
 
-          {/* Opportunities */}
-          <section className="dashboard-card opportunities-card">
-            <div className="card-header">
-              <div>
-                <span className="card-eyebrow">FOR YOU</span>
-                <h2>Recommended opportunities</h2>
-              </div>
-
-              <button className="text-btn">
-                View all
-                <ArrowRight size={15} />
-              </button>
-            </div>
-
-            <div className="opportunities-list">
-              {opportunities.map((opportunity) => (
-                <div className="opportunity-row" key={opportunity.title}>
-                  <div className="company-mark">
-                    {opportunity.company.charAt(0)}
-                  </div>
-
-                  <div className="opportunity-info">
-                    <div className="opportunity-title">
-                      <h3>{opportunity.title}</h3>
-                      <span>{opportunity.type}</span>
-                    </div>
-
-                    <p>
-                      {opportunity.company} · {opportunity.location}
-                    </p>
-                  </div>
-
-                  <div className="match-score">
-                    <strong>{opportunity.match}%</strong>
-                    <span>Match</span>
-                  </div>
-
-                  <button className="view-opportunity">
-                    View
-                    <ArrowRight size={15} />
-                  </button>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          {/* Bottom Grid */}
-          <section className="bottom-grid">
-            <div className="dashboard-card learning-card">
+            {/* Opportunities */}
+            <article className="dashboard-card opportunities-card">
               <div className="card-header">
                 <div>
-                  <span className="card-eyebrow">LEARNING</span>
-                  <h2>Continue learning</h2>
+                  <span className="card-eyebrow">CAREER MATCHES</span>
+                  <h2>Recommended opportunities</h2>
                 </div>
 
-                <button className="text-btn">
+                <button className="text-button">
                   View all
-                  <ArrowRight size={15} />
+                  <ArrowUpRight size={14} />
                 </button>
               </div>
 
-              <div className="course-item">
-                <div className="course-icon">
-                  <BookOpen size={19} />
+              <div className="opportunity-list">
+                {opportunities.map((opportunity) => (
+                  <div
+                    className="opportunity-item"
+                    key={`${opportunity.company}-${opportunity.role}`}
+                  >
+                    <div className="company-logo">
+                      {opportunity.company.charAt(0)}
+                    </div>
+
+                    <div className="opportunity-main">
+                      <strong>{opportunity.role}</strong>
+                      <div>
+                        <span>{opportunity.company}</span>
+                        <i />
+                        <span>{opportunity.type}</span>
+                        <i />
+                        <span>{opportunity.location}</span>
+                      </div>
+                    </div>
+
+                    <div className="match-score">
+                      <strong>{opportunity.match}%</strong>
+                      <span>match</span>
+                    </div>
+
+                    <button className="opportunity-arrow">
+                      <ArrowUpRight size={16} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </article>
+
+            {/* Learning */}
+            <article className="dashboard-card learning-card">
+              <div className="card-header">
+                <div>
+                  <span className="card-eyebrow">KEEP LEARNING</span>
+                  <h2>Continue learning</h2>
                 </div>
 
-                <div className="course-content">
-                  <h3>Node.js Fundamentals</h3>
-                  <p>Module 4 of 8</p>
+                <button className="icon-only-button">
+                  <MoreHorizontal size={18} />
+                </button>
+              </div>
 
-                  <div className="course-progress">
-                    <div
-                      className="course-progress-fill"
-                      style={{ width: "48%" }}
-                    />
+              <div className="learning-content">
+                <div className="learning-icon">
+                  <BookOpen size={23} />
+                </div>
+
+                <div className="learning-info">
+                  <span>BACKEND DEVELOPMENT</span>
+                  <h3>Node.js Fundamentals</h3>
+                  <p>8 lessons · 2h 40m remaining</p>
+
+                  <div className="learning-progress">
+                    <div>
+                      <span />
+                    </div>
+                    <strong>48%</strong>
                   </div>
                 </div>
-
-                <strong>48%</strong>
               </div>
+
+              <button className="continue-button">
+                Continue learning
+                <ArrowRight size={15} />
+              </button>
+            </article>
+          </section>
+
+          {/* Bottom Journey */}
+          <section className="journey-card">
+            <div className="journey-copy">
+              <span className="card-eyebrow">YOUR JOURNEY</span>
+              <h2>Build. Learn. Connect. Grow.</h2>
+              <p>
+                Every assessment and learning milestone brings you one step
+                closer to becoming industry-ready.
+              </p>
             </div>
 
-            <div className="dashboard-card journey-card">
-              <div className="card-eyebrow">YOUR JOURNEY</div>
-
-              <h2>Keep building momentum.</h2>
-
-              <p>
-                You're making progress. Complete your skill gaps to unlock
-                better opportunities.
-              </p>
-
-              <div className="journey-stats">
+            <div className="journey-steps">
+              <div className="journey-step completed">
+                <span className="journey-number">
+                  <CheckCircle2 size={16} />
+                </span>
                 <div>
-                  <strong>4</strong>
-                  <span>Skills assessed</span>
+                  <strong>Profile</strong>
+                  <span>Completed</span>
                 </div>
+              </div>
 
+              <div className="journey-connector active" />
+
+              <div className="journey-step completed">
+                <span className="journey-number">
+                  <CheckCircle2 size={16} />
+                </span>
                 <div>
-                  <strong>7</strong>
-                  <span>Resources completed</span>
+                  <strong>Assessment</strong>
+                  <span>Completed</span>
                 </div>
+              </div>
 
+              <div className="journey-connector active" />
+
+              <div className="journey-step current">
+                <span className="journey-number">03</span>
                 <div>
-                  <strong>3</strong>
-                  <span>Applications</span>
+                  <strong>Skill gaps</strong>
+                  <span>In progress</span>
+                </div>
+              </div>
+
+              <div className="journey-connector" />
+
+              <div className="journey-step">
+                <span className="journey-number">04</span>
+                <div>
+                  <strong>Opportunities</strong>
+                  <span>Next</span>
                 </div>
               </div>
             </div>
