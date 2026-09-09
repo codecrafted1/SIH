@@ -20,7 +20,7 @@ import {
   X,
   Plus,
   MapPin,
-  Clock3,
+  //Clock3,
 } from "lucide-react";
 
 import "./RecruiterDashboard.css";
